@@ -2,7 +2,7 @@
 
 作者： 刘书敏 2015303087 班级： 14011501
 
-Server： 只实现了 GET PUT 操作（可以用浏览器打开）
+Server： 只实现了 GET PUT 操作（可以用浏览器打开 localhost:80）
 Client： 大部分是示例代码，put部分是自己写的
 
 Server中的调用层次参见 ServerUml.png
