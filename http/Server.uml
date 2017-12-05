@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>ssd8.socket.http.server.RequestReader</OriginalElement>
+  <nodes>
+    <node x="575.0" y="0.0">ssd8.socket.http.server.RequestReader</node>
+    <node x="0.0" y="0.0">ssd8.socket.http.server.ResponseBuilder</node>
+    <node x="377.75" y="940.0">ssd8.socket.http.server.Server</node>
+    <node x="249.75" y="388.0">ssd8.socket.http.server.ServiceHandler</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="ssd8.socket.http.server.ServiceHandler" target="ssd8.socket.http.server.RequestReader">
+      <point x="74.25" y="-251.0" />
+      <point x="621.0" y="363.0" />
+      <point x="677.25" y="363.0" />
+      <point x="-102.25" y="169.0" />
+    </edge>
+    <edge source="ssd8.socket.http.server.Server" target="ssd8.socket.http.server.ServiceHandler">
+      <point x="0.0" y="-66.5" />
+      <point x="0.0" y="251.0" />
+    </edge>
+    <edge source="ssd8.socket.http.server.ServiceHandler" target="ssd8.socket.http.server.ResponseBuilder">
+      <point x="-74.25" y="-251.0" />
+      <point x="472.5" y="363.0" />
+      <point x="416.25" y="363.0" />
+      <point x="138.75" y="169.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0999999999999996" x="634.0909090909093" y="666.818181818182" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Methods</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+
