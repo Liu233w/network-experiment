@@ -74,9 +74,35 @@ public class RequestForwarder {
             // 从服务器读取
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
-            int c;
-            while((c = in.read()) != -1) {
-                byteArrayOutputStream.write(c);
+            String line = readLineFromStream();
+            byteArrayOutputStream.write(line.getBytes());
+
+            // 处理 header
+            HashMap<String, String> headers = new HashMap<>();
+            line = readLineFromStream();
+            while (line != null && !line.equals("")) {
+                byteArrayOutputStream.write(line.getBytes());
+                // 处理 headers
+                String[] header = line.split(": ", 2);
+                headers.put(header[0], header[1]);
+                line = readLineFromStream();
+            }
+            byteArrayOutputStream.write("\r\n".getBytes());
+
+            // 处理 content
+            String lengthS = headers.get("Content-Length");
+            if (lengthS != null) {
+                // 不考虑格式不正确的情况
+                int length = Integer.parseInt(lengthS);
+                byte[] content = new byte[length];
+                int readed = 0;
+                while (readed < length) {
+                    // 在读够之前一直读取，read不会一次返回所有数据
+                    readed += in.read(content, readed, length - readed);
+                    System.out.println("readed: " + readed);
+                }
+
+                byteArrayOutputStream.write(content);
             }
 
             res = byteArrayOutputStream.toByteArray();
@@ -96,5 +122,28 @@ public class RequestForwarder {
 
             return res;
         }
+    }
+
+    /**
+     * 从流中读取一行并返回
+     *
+     * @return
+     */
+    private String readLineFromStream() throws IOException {
+
+        StringBuilder sb = new StringBuilder();
+
+        int c;
+        while ((c = in.read()) != -1) {
+            switch (c) {
+                case '\r':
+                    break;
+                case '\n':
+                    return sb.toString();
+                default:
+                    sb.append((char) c);
+            }
+        }
+        return sb.toString();
     }
 }
