@@ -11,6 +11,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class MeetingServiceImpl extends UnicastRemoteObject implements MeetingService {
 
@@ -47,19 +48,30 @@ public class MeetingServiceImpl extends UnicastRemoteObject implements MeetingSe
         }
 
         // 跟任意一个与会者时间冲突的会议
-        List<Meeting> conflictMeetings = doQuery(meeting.getStart(), meeting.getEnd());
+        Stream<Meeting> conflictMeetings = meetings.stream()
+                .filter(item ->
+                        // meeting.start 在 item 的时间中间
+                        item.getStart().before(meeting.getStart()) && item.getEnd().after(meeting.getStart())
+                                // meeting.end 在 item 的时间中间
+                                || item.getStart().before(meeting.getEnd()) && item.getEnd().after(meeting.getEnd())
+                                // item.start 在 meeting 的时间中间（防止 meeting 把 item 整个包进去的情况）
+                                || meeting.getStart().before(item.getStart()) && meeting.getEnd().after(item.getStart())
+                                // item 正好等于 meeting（两端点重合时，且内部重合的情况；紧挨着的两个会议不算）
+                                || meeting.getStart().equals(item.getStart()) && meeting.getEnd().equals(item.getEnd())
+                );
 
         // 便于下文查询使用
         ArrayList<String> myMeetingUsers = new ArrayList<>();
         myMeetingUsers.add(meeting.getCreator());
         myMeetingUsers.add(meeting.getOtherUser());
 
-        conflictMeetings.removeIf(item ->
-                !myMeetingUsers.contains(item.getCreator())
-                        && !myMeetingUsers.contains(item.getOtherUser()));
+        List<Meeting> conflictMeetingList = conflictMeetings.filter(item ->
+                myMeetingUsers.contains(item.getCreator())
+                        || myMeetingUsers.contains(item.getOtherUser()))
+                .collect(Collectors.toList());
 
-        if (conflictMeetings.size() >= 1) {
-            throw new AddMeetingException(conflictMeetings);
+        if (conflictMeetingList.size() >= 1) {
+            throw new AddMeetingException(conflictMeetingList);
         }
 
         meeting.setId(generateNewMeetingId());
@@ -69,17 +81,6 @@ public class MeetingServiceImpl extends UnicastRemoteObject implements MeetingSe
     @Override
     public List<Meeting> query(Date start, Date end, String username, String password) throws RemoteException, LoginFailedException {
         ensureLogined(username, password);
-        return doQuery(start, end);
-    }
-
-    /**
-     * 查找在 start 和 end 之间的所有会议
-     *
-     * @param start
-     * @param end
-     * @return
-     */
-    private List<Meeting> doQuery(Date start, Date end) {
         return meetings.stream()
                 .filter(item -> !item.getStart().before(start)
                         && !item.getEnd().after(end))
