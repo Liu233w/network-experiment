@@ -54,8 +54,9 @@ public class MeetingServiceImpl extends UnicastRemoteObject implements MeetingSe
                         item.getStart().before(meeting.getStart()) && item.getEnd().after(meeting.getStart())
                                 // meeting.end 在 item 的时间中间
                                 || item.getStart().before(meeting.getEnd()) && item.getEnd().after(meeting.getEnd())
-                                // item.start 在 meeting 的时间中间（防止 meeting 把 item 整个包进去的情况）
+                                // item.start 和 end 在 meeting 的时间中间（防止 meeting 把 item 整个包进去的情况）
                                 || meeting.getStart().before(item.getStart()) && meeting.getEnd().after(item.getStart())
+                                || meeting.getStart().before(item.getEnd()) && meeting.getEnd().after(item.getEnd())
                                 // item 正好等于 meeting（两端点重合时，且内部重合的情况；紧挨着的两个会议不算）
                                 || meeting.getStart().equals(item.getStart()) && meeting.getEnd().equals(item.getEnd())
                 );
