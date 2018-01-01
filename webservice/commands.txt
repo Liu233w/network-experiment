@@ -1,0 +1,3 @@
+c:\sources\network\webservice\server\out\production\server>wsgen -cp . com.liu233w.network.webservice.server.TodoListService -wsdl -inlineSchemas -s out
+
+c:\sources\network\webservice\client>wsimport -keep http://localhost:8888/TodoList?wsdl
